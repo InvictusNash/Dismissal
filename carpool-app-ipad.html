@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Carpool Dismissal - iPad</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        input {
+            font-size: 16px !important;
+            -webkit-user-select: text;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 15px;
+            overflow: hidden;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            height: calc(100vh - 100px);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .column {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .column-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        /* LEFT COLUMN - Number Pad */
+        .display-screen {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .display-number {
+            font-size: 36px;
+            font-weight: 700;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            text-align: right;
+            letter-spacing: 3px;
+        }
+
+        .display-row {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffaa00;
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        .number-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .num-btn {
+            padding: 18px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(145deg, #f0f0f0, #d9d9d9);
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .num-btn:active {
+            transform: scale(0.95);
+        }
+
+        .clear-btn {
+            padding: 18px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(145deg, #ff6b6b, #ee5a52);
+            font-size: 15px;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+        }
+
+        .backspace-btn {
+            padding: 18px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(145deg, #ffd93d, #f9ca24);
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .row-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .row-btn {
+            padding: 15px;
+            border: 3px solid #e0e0e0;
+            border-radius: 10px;
+            background: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .row-btn.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .submit-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* MIDDLE COLUMN - Recent Submissions */
+        .submission-log {
+            max-height: 100%;
+            overflow-y: auto;
+        }
+
+        .log-item {
+            background: #f8f9fa;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #667eea;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-50%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .log-item-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .log-item-details {
+            display: flex;
+            gap: 8px;
+            font-size: 11px;
+        }
+
+        .log-item-number {
+            background: #e3f2fd;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .log-item-row {
+            background: #f3e5f5;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .empty-log {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
+            font-style: italic;
+        }
+
+        /* RIGHT COLUMN - Student List */
+        .search-box {
+            margin-bottom: 15px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .student-list {
+            max-height: calc(100% - 60px);
+            overflow-y: auto;
+        }
+
+        .student-item {
+            padding: 12px 15px;
+            margin-bottom: 6px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 4px solid transparent;
+        }
+
+        .student-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .student-item:active {
+            transform: scale(0.98);
+        }
+
+        .student-name {
+            font-weight: 600;
+            font-size: 15px;
+            color: white;
+        }
+
+        /* Community Colors */
+        .community-SH { background: linear-gradient(135deg, #ff8c00 0%, #ff6600 100%); border-left-color: #ff6600; }
+        .community-NG { background: linear-gradient(135deg, #00c851 0%, #007e33 100%); border-left-color: #007e33; }
+        .community-MA { background: linear-gradient(135deg, #f9a825 0%, #f57f17 100%); border-left-color: #f57f17; }
+        .community-ZNH { background: linear-gradient(135deg, #616161 0%, #424242 100%); border-left-color: #424242; }
+        .community-RF { background: linear-gradient(135deg, #1976D2 0%, #0d47a1 100%); border-left-color: #0d47a1; }
+        .community-EG { background: linear-gradient(135deg, #f44336 0%, #c62828 100%); border-left-color: #c62828; }
+
+        .message {
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        /* Settings button */
+        .settings-btn {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 1000;
+        }
+
+        .settings-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            padding: 40px;
+        }
+
+        .settings-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .settings-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .settings-content label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .settings-content input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+        }
+
+        .settings-content button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <button class="settings-btn" onclick="toggleSettings()">⚙️ Settings</button>
+
+    <div class="header">
+        <h1>🚗 Carpool Dismissal - iPad</h1>
+    </div>
+
+    <div class="main-container">
+        <!-- LEFT COLUMN: Student List -->
+        <div class="column">
+            <div class="column-title">All Students (A-Z)</div>
+            
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search students..." oninput="filterStudents()">
+            </div>
+
+            <div class="student-list" id="studentList">
+                <div class="empty-log">Loading students...</div>
+            </div>
+        </div>
+
+        <!-- MIDDLE COLUMN: Recent Submissions -->
+        <div class="column">
+            <div class="column-title">Recent Submissions</div>
+            <div class="submission-log" id="submissionLog">
+                <div class="empty-log">No submissions yet</div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Number Pad -->
+        <div class="column">
+            <div class="column-title">Enter Number</div>
+            
+            <div class="display-screen">
+                <div class="display-number" id="displayNumber">―</div>
+                <div class="display-row" id="displayRow"></div>
+            </div>
+
+            <div class="number-pad">
+                <button class="num-btn" onclick="addDigit('1')">1</button>
+                <button class="num-btn" onclick="addDigit('2')">2</button>
+                <button class="num-btn" onclick="addDigit('3')">3</button>
+                <button class="num-btn" onclick="addDigit('4')">4</button>
+                <button class="num-btn" onclick="addDigit('5')">5</button>
+                <button class="num-btn" onclick="addDigit('6')">6</button>
+                <button class="num-btn" onclick="addDigit('7')">7</button>
+                <button class="num-btn" onclick="addDigit('8')">8</button>
+                <button class="num-btn" onclick="addDigit('9')">9</button>
+                <button class="clear-btn" onclick="clearDisplay()">CLEAR</button>
+                <button class="num-btn" onclick="addDigit('0')">0</button>
+                <button class="backspace-btn" onclick="backspace()">⌫</button>
+            </div>
+
+            <div class="row-buttons">
+                <button class="row-btn" id="rowOne" onclick="selectRow('ONE')">ROW 1</button>
+                <button class="row-btn" id="rowTwo" onclick="selectRow('TWO')">ROW 2</button>
+            </div>
+
+            <button class="submit-btn" onclick="submitCard()">SUBMIT PICKUP</button>
+            <div id="submitMessage"></div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="settings-modal" id="settingsModal">
+        <div class="settings-content">
+            <h2 style="margin-bottom: 20px;">Settings</h2>
+            
+            <label>Spreadsheet ID:</label>
+            <input type="text" id="spreadsheetId" placeholder="Your spreadsheet ID">
+            
+            <label>Data Sheet Name:</label>
+            <input type="text" id="dataSheetName" value="Data">
+            
+            <label>Form Responses Sheet Name:</label>
+            <input type="text" id="responsesSheetName" value="Form responses">
+            
+            <label>Google Apps Script Web App URL:</label>
+            <input type="text" id="webAppUrl" placeholder="https://script.google.com/...">
+            
+            <div style="margin-top: 20px;">
+                <button class="btn-primary" onclick="saveConfig()">Save Configuration</button>
+                <button class="btn-secondary" onclick="toggleSettings()">Close</button>
+            </div>
+            
+            <div id="configMessage"></div>
+        </div>
+    </div>
+
+    <script>
+        let selectedRow = null;
+        let studentData = [];
+        let allStudents = [];
+        let currentNumber = '';
+        let submissionLog = [];
+        let config = {
+            spreadsheetId: '',
+            dataSheetName: 'Data',
+            responsesSheetName: 'Form responses',
+            webAppUrl: ''
+        };
+
+        function loadConfig() {
+            const saved = localStorage.getItem('carpoolConfigIPad');
+            if (saved) {
+                config = JSON.parse(saved);
+                document.getElementById('spreadsheetId').value = config.spreadsheetId || '';
+                document.getElementById('dataSheetName').value = config.dataSheetName || 'Data';
+                document.getElementById('responsesSheetName').value = config.responsesSheetName || 'Form responses';
+                document.getElementById('webAppUrl').value = config.webAppUrl || '';
+                
+                if (config.webAppUrl) {
+                    loadStudentData();
+                }
+            }
+        }
+
+        function saveConfig() {
+            config.spreadsheetId = document.getElementById('spreadsheetId').value;
+            config.dataSheetName = document.getElementById('dataSheetName').value;
+            config.responsesSheetName = document.getElementById('responsesSheetName').value;
+            config.webAppUrl = document.getElementById('webAppUrl').value;
+            
+            localStorage.setItem('carpoolConfigIPad', JSON.stringify(config));
+            
+            const msg = document.getElementById('configMessage');
+            msg.innerHTML = '<div class="message success">Configuration saved!</div>';
+            
+            loadStudentData();
+            
+            setTimeout(() => {
+                toggleSettings();
+            }, 1500);
+        }
+
+        function toggleSettings() {
+            document.getElementById('settingsModal').classList.toggle('active');
+        }
+
+        async function loadStudentData() {
+            if (!config.webAppUrl) return;
+
+            try {
+                const response = await fetch(`${config.webAppUrl}?action=getStudents&spreadsheetId=${config.spreadsheetId}&sheetName=${config.dataSheetName}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    studentData = data.students;
+                    allStudents = [...data.students].sort((a, b) => a.name.localeCompare(b.name));
+                    renderStudentList();
+                    console.log('Loaded', studentData.length, 'students');
+                }
+            } catch (error) {
+                console.error('Error loading students:', error);
+            }
+        }
+
+        function renderStudentList() {
+            const listContainer = document.getElementById('studentList');
+            
+            if (allStudents.length === 0) {
+                listContainer.innerHTML = '<div class="empty-log">No students loaded</div>';
+                return;
+            }
+            
+            let html = '';
+            allStudents.forEach(student => {
+                const communityClass = `community-${student.community || 'UNKNOWN'}`;
+                html += `
+                    <div class="student-item ${communityClass}" onclick="selectStudent('${student.number}', '${student.name.replace(/'/g, "\\'")}')">
+                        <div class="student-name">${student.number} - ${student.name}</div>
+                    </div>
+                `;
+            });
+            
+            listContainer.innerHTML = html;
+        }
+
+        function filterStudents() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const listContainer = document.getElementById('studentList');
+            
+            if (!searchTerm) {
+                renderStudentList();
+                return;
+            }
+            
+            const filtered = allStudents.filter(s => 
+                s.name.toLowerCase().includes(searchTerm) || 
+                s.number.toString().includes(searchTerm)
+            );
+            
+            if (filtered.length === 0) {
+                listContainer.innerHTML = '<div class="empty-log">No matches found</div>';
+                return;
+            }
+            
+            let html = '';
+            filtered.forEach(student => {
+                const communityClass = `community-${student.community || 'UNKNOWN'}`;
+                html += `
+                    <div class="student-item ${communityClass}" onclick="selectStudent('${student.number}', '${student.name.replace(/'/g, "\\'")}')">
+                        <div class="student-name">${student.number} - ${student.name}</div>
+                    </div>
+                `;
+            });
+            
+            listContainer.innerHTML = html;
+        }
+
+        function selectStudent(number, name) {
+            currentNumber = number;
+            updateDisplay();
+            
+            const msgDiv = document.getElementById('submitMessage');
+            msgDiv.innerHTML = `<div class="message success">Selected: ${name} (#${number})<br>Now select ROW 1 or ROW 2</div>`;
+            
+            setTimeout(() => {
+                msgDiv.innerHTML = '';
+            }, 3000);
+        }
+
+        function addDigit(digit) {
+            currentNumber += digit;
+            updateDisplay();
+        }
+
+        function backspace() {
+            currentNumber = currentNumber.slice(0, -1);
+            updateDisplay();
+        }
+
+        function clearDisplay() {
+            currentNumber = '';
+            selectedRow = null;
+            updateDisplay();
+            document.getElementById('rowOne').classList.remove('selected');
+            document.getElementById('rowTwo').classList.remove('selected');
+        }
+
+        function updateDisplay() {
+            document.getElementById('displayNumber').textContent = currentNumber || '―';
+            document.getElementById('displayRow').textContent = selectedRow ? `ROW ${selectedRow === 'ONE' ? '1' : '2'}` : '';
+        }
+
+        function selectRow(row) {
+            selectedRow = row;
+            document.getElementById('rowOne').classList.toggle('selected', row === 'ONE');
+            document.getElementById('rowTwo').classList.toggle('selected', row === 'TWO');
+            updateDisplay();
+        }
+
+        async function submitCard() {
+            const msgDiv = document.getElementById('submitMessage');
+
+            if (!currentNumber) {
+                msgDiv.innerHTML = '<div class="message error">Enter a card number</div>';
+                setTimeout(() => msgDiv.innerHTML = '', 2000);
+                return;
+            }
+
+            if (!selectedRow) {
+                msgDiv.innerHTML = '<div class="message error">Select ROW 1 or ROW 2</div>';
+                setTimeout(() => msgDiv.innerHTML = '', 2000);
+                return;
+            }
+
+            if (!config.webAppUrl) {
+                msgDiv.innerHTML = '<div class="message error">Configure settings first</div>';
+                return;
+            }
+
+            const student = studentData.find(s => s.number == currentNumber);
+            const studentName = student ? student.name : 'Unknown';
+
+            msgDiv.innerHTML = '<div class="message info">Submitting...</div>';
+
+            try {
+                const params = new URLSearchParams({
+                    action: 'submitPickup',
+                    spreadsheetId: config.spreadsheetId,
+                    sheetName: config.responsesSheetName,
+                    cardNumber: currentNumber,
+                    rowType: selectedRow,
+                    studentName: studentName
+                });
+
+                const url = `${config.webAppUrl}?${params.toString()}`;
+                
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = url;
+                document.body.appendChild(iframe);
+                
+                setTimeout(() => {
+                    msgDiv.innerHTML = `<div class="message success">✓ ${studentName} (#${currentNumber})</div>`;
+                    
+                    addToSubmissionLog(studentName, currentNumber, selectedRow);
+                    clearDisplay();
+                    
+                    setTimeout(() => {
+                        document.body.removeChild(iframe);
+                        msgDiv.innerHTML = '';
+                    }, 2000);
+                }, 500);
+
+            } catch (error) {
+                console.error('Submission error:', error);
+                msgDiv.innerHTML = `<div class="message error">Error: ${error.message}</div>`;
+            }
+        }
+
+        function addToSubmissionLog(name, number, row) {
+            const logContainer = document.getElementById('submissionLog');
+            
+            const emptyMsg = logContainer.querySelector('.empty-log');
+            if (emptyMsg) {
+                emptyMsg.remove();
+            }
+            
+            const entry = {
+                name: name,
+                number: number,
+                row: row,
+                time: new Date().toLocaleTimeString()
+            };
+            
+            submissionLog.unshift(entry);
+            
+            if (submissionLog.length > 30) {
+                submissionLog.pop();
+            }
+            
+            updateSubmissionLog();
+        }
+
+        function updateSubmissionLog() {
+            const logContainer = document.getElementById('submissionLog');
+            
+            if (submissionLog.length === 0) {
+                logContainer.innerHTML = '<div class="empty-log">No submissions yet</div>';
+                return;
+            }
+            
+            let html = '';
+            submissionLog.forEach(entry => {
+                html += `
+                    <div class="log-item">
+                        <div>
+                            <div class="log-item-name">${entry.name}</div>
+                            <div style="font-size: 10px; color: #999; margin-top: 2px;">${entry.time}</div>
+                        </div>
+                        <div class="log-item-details">
+                            <span class="log-item-number">#${entry.number}</span>
+                            <span class="log-item-row">ROW ${entry.row === 'ONE' ? '1' : '2'}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            logContainer.innerHTML = html;
+        }
+
+        loadConfig();
+    </script>
+</body>
+</html>
