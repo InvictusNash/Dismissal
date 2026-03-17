@@ -151,18 +151,12 @@
             box-shadow: 0 6px 20px rgba(0,0,0,0.5);
             line-height: 1;
             position: relative;
-            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
-            cursor: grab;
+            cursor: pointer;
             user-select: none;
-            touch-action: pan-y;
         }
 
         .pickup-item:active {
-            cursor: grabbing;
-        }
-
-        .pickup-item.swiping {
-            transition: none;
+            transform: scale(0.98);
         }
 
         .pickup-item.dismissed-left {
@@ -581,67 +575,55 @@
         }
 
         function enableSwipeToDismiss(element) {
-            let startX = 0;
-            let currentX = 0;
-            let isDragging = false;
-
-            element.addEventListener('touchstart', (e) => {
-                startX = e.touches[0].clientX;
-                isDragging = true;
-                element.classList.add('swiping');
-            });
-
-            element.addEventListener('touchmove', (e) => {
-                if (!isDragging) return;
-                
-                currentX = e.touches[0].clientX;
-                const diffX = currentX - startX;
-                
-                // Move the element with the finger
-                element.style.transform = `translateX(${diffX}px)`;
-                element.style.opacity = 1 - Math.abs(diffX) / 300;
-            });
+            let tapCount = 0;
+            let tapTimer = null;
 
             element.addEventListener('touchend', (e) => {
-                if (!isDragging) return;
+                tapCount++;
                 
-                const diffX = currentX - startX;
-                const threshold = 100; // Minimum swipe distance to dismiss
-                
-                element.classList.remove('swiping');
-                
-                if (Math.abs(diffX) > threshold) {
-                    // Dismiss the item
-                    if (diffX > 0) {
-                        element.classList.add('dismissed-right');
-                    } else {
-                        element.classList.add('dismissed-left');
-                    }
+                if (tapCount === 1) {
+                    // First tap - start timer
+                    tapTimer = setTimeout(() => {
+                        tapCount = 0;
+                    }, 300); // Reset after 300ms
+                } else if (tapCount === 2) {
+                    // Double tap detected!
+                    clearTimeout(tapTimer);
+                    tapCount = 0;
+                    
+                    // Dismiss the item with random direction for visual variety
+                    const direction = Math.random() > 0.5 ? 'right' : 'left';
+                    element.classList.add(`dismissed-${direction}`);
                     
                     // Remove from DOM after animation
                     setTimeout(() => {
                         element.remove();
                     }, 400);
-                } else {
-                    // Snap back to original position
-                    element.style.transform = '';
-                    element.style.opacity = '';
                 }
-                
-                isDragging = false;
-                startX = 0;
-                currentX = 0;
             });
 
-            element.addEventListener('touchcancel', () => {
-                if (!isDragging) return;
+            // Also support regular click for desktop/testing
+            let clickCount = 0;
+            let clickTimer = null;
+
+            element.addEventListener('click', (e) => {
+                clickCount++;
                 
-                element.classList.remove('swiping');
-                element.style.transform = '';
-                element.style.opacity = '';
-                isDragging = false;
-                startX = 0;
-                currentX = 0;
+                if (clickCount === 1) {
+                    clickTimer = setTimeout(() => {
+                        clickCount = 0;
+                    }, 300);
+                } else if (clickCount === 2) {
+                    clearTimeout(clickTimer);
+                    clickCount = 0;
+                    
+                    const direction = Math.random() > 0.5 ? 'right' : 'left';
+                    element.classList.add(`dismissed-${direction}`);
+                    
+                    setTimeout(() => {
+                        element.remove();
+                    }, 400);
+                }
             });
         }
 
